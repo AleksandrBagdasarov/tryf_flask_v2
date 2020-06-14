@@ -29,24 +29,39 @@
         }
     </style>
 
-
-    <title> {% block title %} {% endblock %} </title>
+    {% if title %}
+    <title> {{ title }} </title>
+    {% endif %}
 </head>
 
 <body>
-    <nav class="site-header sticky-top py-1">
-        <div class="container d-flex flex-column flex-md-row justify-content-between">
-            
-            <a class="py-2 d-none d-md-inline-block" href="/">Home</a>
-            <a class="py-2 d-none d-md-inline-block" href="about">About</a>
-            <a class="py-2 d-none d-md-inline-block" href="cart">Cart</a>
-            <a class="py-2 d-none d-md-inline-block" href="login">Login</a>
-        </div>
-    </nav>
-    <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
-    {% block body %}
-    {% endblock %}
-    </div>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-secondary fixed-top">
+            <div class="container d-flex flex-column flex-md-row justify-content-between">
+
+                <a class="py-2 d-none d-md-inline-block text-white" href="/">Home</a>
+                <a class="py-2 d-none d-md-inline-block text-white" href="about">About</a>
+                <a class="py-2 d-none d-md-inline-block text-white" href="cart">Cart</a>
+                <a class="py-2 d-none d-md-inline-block text-white" href="login">Login</a>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="container">
+            <div class="col-md-8">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+            </div>
+            {% block body %}
+            {% endblock %}
+    </main>
 </body>
 
 </html>
