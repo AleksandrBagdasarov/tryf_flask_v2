@@ -1,4 +1,5 @@
 from flask import render_template, redirect, request, url_for
+from mysite.forms import RegistrationForm, LoginForm
 
 
 def about():
@@ -10,10 +11,11 @@ def home():
 
 
 def login():
+    form = LoginForm()
     if request.method == 'POST':
         return redirect(url_for('home'))
     else:
-        return render_template('login.html')
+        return render_template('login.html', title='Login', form=form)
 
 
 def cart():
@@ -45,7 +47,8 @@ def profile():
 
 
 def register():
+    form = RegistrationForm()
     if request.method == 'POST':
         return redirect(url_for('home'))
     else:
-        return render_template('register.html')
+        return render_template('register.html', title='Register', form=form)
