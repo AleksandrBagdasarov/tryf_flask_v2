@@ -1,7 +1,10 @@
 from flask import flash, redirect, render_template, request, url_for
+import os
+import secrets
+from PIL import Image
 
-from mysite import bcrypt, db 
-from mysite.forms import RegistrationForm, LoginForm
+from mysite import app, bcrypt, db 
+from mysite.forms import LoginForm, RegistrationForm, UpdateAccountForm
 from mysite.models import Product, Product_img, User 
 from flask_login import  current_user, login_user, login_required, logout_user
 
@@ -11,7 +14,26 @@ def about():
 
 
 def account():
-    return render_template('account.html', title='Account')
+    img = url_for('static', filename=current_user.img)
+    form = UpdateAccountForm()    
+    if form.validate_on_submit():        
+        if form.img.data:
+            #picture_file = save_img(form.img.data)
+            current_user.img = save_img(form.img.data)
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        current_user.email = form.email.data
+        db.session.commit()
+        
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+        
+    form.first_name.data = current_user.first_name
+    form.last_name.data = current_user.last_name
+    form.email.data = current_user.email
+        
+
+    return render_template('account.html', title='Account', form=form, img=img)
 
 
 def cart():
@@ -82,3 +104,17 @@ def register():
             return redirect(url_for('login'))
         else:
             return render_template('register.html', title='Register', form=form)
+
+
+def save_img(img_for_save):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(img_for_save.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(img_for_save)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
